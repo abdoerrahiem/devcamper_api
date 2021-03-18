@@ -1,4 +1,4 @@
-const sendTokenResponse = (user, res) => {
+const sendTokenResponse = (user, status, res) => {
   const token = user.getSignedJwtToken()
 
   const options = {
@@ -12,7 +12,7 @@ const sendTokenResponse = (user, res) => {
     options.secure = true
   }
 
-  res.cookie('token', token, options).json({
+  res.cookie('token', token, options).status(status).json({
     success: true,
     token,
   })

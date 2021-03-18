@@ -2,16 +2,21 @@ const nodemailer = require('nodemailer')
 
 const sendEmail = async (options) => {
   const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: process.env.SMTP_PORT,
-    auth: { user: process.env.SMTP_EMAIL, pass: process.env.SMTP_PASSWORD },
+    // name: process.env.SMTP_HOST,
+    // host: process.env.SMTP_HOST,
+    // port: process.env.SMTP_PORT,
+    service: 'Gmail',
+    auth: { user: process.env.USER, pass: process.env.PASS },
   })
 
   const message = {
     from: `${process.env.FROM_NAME} <${process.env.FROM_EMAIL}>`,
     to: options.email,
     subject: options.subject,
-    text: options.message,
+    html: `<h2>Hai, ${options.email}</h2>
+        <p>Terima kasih telah mendaftar. Silahkan konfirmasi akunmu dengan mengklik link dibawah ini!</p>
+        <a href=${options.confirmEmailUrl}>Konfirmasi Akun Saya</a>
+        </div>`,
   }
 
   const info = await transporter.sendMail(message)

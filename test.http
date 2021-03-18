@@ -1,0 +1,11 @@
+// AUTH
+### Register
+POST http://localhost:5000/api/v1/auth/register
+Content-Type: application/json
+
+{
+    "name": "Abdur Rahim",
+    "email": "abdoerrahiem@gmail.com",
+    "password": "abdoerrahiem",
+    "role": "publisher"
+}

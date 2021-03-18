@@ -11,7 +11,7 @@ exports.register = asyncHandler(async (req, res, next) => {
 
   const user = await User.create({ name, email, password, role })
 
-  sendTokenResponse(user, res)
+  sendTokenResponse(user, 200, res)
 })
 
 // Login user // Public

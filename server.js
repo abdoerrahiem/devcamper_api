@@ -1,5 +1,6 @@
+require('dotenv').config()
 const express = require('express')
-const dotenv = require('dotenv')
+const fs = require('fs')
 const morgan = require('morgan')
 const fileupload = require('express-fileupload')
 const path = require('path')
@@ -11,13 +12,12 @@ var rateLimit = require('express-rate-limit')
 var hpp = require('hpp')
 var cors = require('cors')
 const connectDB = require('./config/connectDB')
-const errorHandler = require('./middleware/errorHandler')
+const { notFoundRoute, errorHandler } = require('./middleware/error')
 require('colors')
-
-dotenv.config({ path: './config/config.env' })
 
 const app = express()
 
+// Connect database
 connectDB()
 
 if (process.env.NODE_ENV === 'development') {
@@ -47,14 +47,22 @@ app.use(hpp())
 
 app.use(cors())
 
+// Setting folder statis
 app.use(express.static(path.join(__dirname, 'public')))
 
-app.use('/bootcamps', require('./routes/bootcamps'))
-app.use('/courses', require('./routes/courses'))
-app.use('/users', require('./routes/users'))
-app.use('/admin', require('./routes/admin'))
-app.use('/reviews', require('./routes/reviews'))
+// Routes
+fs.readdirSync('./routes').map((route) => {
+  route = route.split('.')[0]
 
+  return app.use(`/api/v1/${route}`, require(`./routes/${route}`))
+})
+// app.use('/bootcamps', require('./routes/bootcamps'))
+// app.use('/courses', require('./routes/courses'))
+// app.use('/users', require('./routes/users'))
+// app.use('/admin', require('./routes/admin'))
+// app.use('/reviews', require('./routes/reviews'))
+
+app.use(notFoundRoute)
 app.use(errorHandler)
 
 const PORT = process.env.PORT || 5000
@@ -66,6 +74,7 @@ const server = app.listen(
   )
 )
 
+// Handle unhandled promise rejections
 process.on('unhandledRejection', (err, promise) => {
   console.log(
     `Tidak dapat terhubung! Pesan error: ${err.message}.`.toUpperCase().bgRed
