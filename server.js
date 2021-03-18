@@ -7,15 +7,19 @@ const path = require('path')
 const cookieParser = require('cookie-parser')
 const mongoSanitize = require('express-mongo-sanitize')
 const helmet = require('helmet')
-var xss = require('xss-clean')
-var rateLimit = require('express-rate-limit')
-var hpp = require('hpp')
-var cors = require('cors')
+const xss = require('xss-clean')
+const rateLimit = require('express-rate-limit')
+const hpp = require('hpp')
+const cors = require('cors')
+const passport = require('passport')
 const connectDB = require('./config/connectDB')
 const { notFoundRoute, errorHandler } = require('./middleware/error')
 require('colors')
 
 const app = express()
+
+// Passport config
+require('./config/passport')(passport)
 
 // Connect database
 connectDB()
@@ -47,6 +51,10 @@ app.use(hpp())
 
 app.use(cors())
 
+// Passport middleware
+app.use(passport.initialize())
+app.use(passport.session())
+
 // Setting folder statis
 app.use(express.static(path.join(__dirname, 'public')))
 
@@ -56,6 +64,7 @@ fs.readdirSync('./routes').map((route) => {
 
   return app.use(`/api/v1/${route}`, require(`./routes/${route}`))
 })
+
 // app.use('/bootcamps', require('./routes/bootcamps'))
 // app.use('/courses', require('./routes/courses'))
 // app.use('/users', require('./routes/users'))
